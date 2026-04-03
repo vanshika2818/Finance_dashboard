@@ -1,16 +1,42 @@
-# React + Vite
+# 📊 FinanceHub Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive, and interactive frontend dashboard built to track and analyze financial activity. This project demonstrates clean architecture, efficient state management, and intuitive UI/UX design.
 
-Currently, two official plugins are available:
+## ✨ Features Implemented
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### 📈 Dashboard & Visualizations
+* **Dashboard Overview:** Real-time summary cards displaying Total Balance, Income, and Expenses.
+* **Balance Trend (Time-Based):** Interactive line chart visualization tracking financial growth over time.
+* **Spending Breakdown (Categorical):** Interactive pie chart visualizing expense distribution by category.
+* **Smart Insights:** Automated observation engine highlighting key data points (e.g., Highest spending category).
 
-## React Compiler
+### 💸 Transaction Management
+* **Detailed Ledger:** Comprehensive list view of all transactions (Date, Amount, Category, Type).
+* **Advanced Filtering:** Instantly filter transactions by 'Income' or 'Expense' types.
+* **Real-time Search:** Search transactions seamlessly by category or description.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🔐 Role-Based Access Control (RBAC) Simulation
+* **Viewer Role:** Read-only access to explore the dashboard and transaction data.
+* **Admin Role:** Elevated privileges revealing UI to add and manage new transactions.
+* **Role Switcher:** Instant UI toggle to demonstrate simulated permissions.
 
-## Expanding the ESLint configuration
+### 🛠 Technical Architecture & UX
+* **State Management:** Implemented using **Zustand** for lightweight, predictable, and boilerplate-free global state handling.
+* **Responsive Design:** Fully fluid UI built with **Tailwind CSS**, ensuring a seamless experience across desktop, tablet, and mobile devices.
+* **Graceful Degradation:** Beautifully handled empty states and 'No Data Found' scenarios.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🚀 Why This Architecture?
+* **React + Vite:** Chosen for lightning-fast HMR and optimal build performance.
+* **Zustand over Context/Redux:** Provides the perfect balance of simplicity and power for a dashboard of this scale, avoiding the heavy boilerplate of Redux and the unnecessary re-renders of React Context.
+* **Recharts:** Selected for declarative, responsive, and easily customizable SVG charts that integrate natively with React.
+
+---
+
+## 💻 Tech Stack
+* **Framework:** React.js (via Vite)
+* **Styling:** Tailwind CSS
+* **State Management:** Zustand
+* **Charts:** Recharts
+* **Notifications:** React-Hot-Toast (if implemented)
