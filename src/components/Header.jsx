@@ -34,6 +34,8 @@ export default function Header({ onOpenMenu }) {
   const setRole = useStore((s) => s.setRole)
   const theme = useStore((s) => s.theme)
   const toggleTheme = useStore((s) => s.toggleTheme)
+  const currency = useStore((s) => s.currency)
+  const setCurrency = useStore((s) => s.setCurrency)
 
   const roleSelectValue = useMemo(() => {
     return role === 'admin' ? 'Admin' : 'Viewer'
@@ -83,18 +85,42 @@ export default function Header({ onOpenMenu }) {
             )}
           </button>
 
-          <div className="flex items-center gap-2">
-            <span className="hidden text-sm font-medium text-slate-600 dark:text-slate-400 sm:inline">
-              Role Switcher
-            </span>
-            <select
-              value={roleSelectValue}
-              onChange={onRoleChange}
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-indigo-400 dark:focus:ring-indigo-400/30"
-            >
-              <option value="Viewer">Viewer</option>
-              <option value="Admin">Admin</option>
-            </select>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2">
+              <span className="hidden text-sm font-medium text-slate-600 dark:text-slate-400 sm:inline">
+                Currency
+              </span>
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-indigo-400 dark:focus:ring-indigo-400/30"
+                aria-label="Select currency"
+              >
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+                <option value="JPY">JPY (¥)</option>
+                <option value="INR">INR (₹)</option>
+                <option value="AUD">AUD (A$)</option>
+                <option value="CAD">CAD (C$)</option>
+                <option value="CHF">CHF</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="hidden text-sm font-medium text-slate-600 dark:text-slate-400 sm:inline">
+                Role
+              </span>
+              <select
+                value={roleSelectValue}
+                onChange={onRoleChange}
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-indigo-400 dark:focus:ring-indigo-400/30"
+                aria-label="Select role"
+              >
+                <option value="Viewer">Viewer</option>
+                <option value="Admin">Admin</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>

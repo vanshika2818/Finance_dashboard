@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 import { useStore } from '../store/useStore'
 import { exportToCSV } from '../utils/exportToCSV'
+import { formatCurrency } from '../utils/currency'
 
 function ExportIcon({ className }) {
   return (
@@ -22,17 +24,6 @@ function ExportIcon({ className }) {
   )
 }
 
-function formatMoney(value) {
-  const numberValue = Number(value)
-  if (!Number.isFinite(numberValue)) return '$0.00'
-
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format(numberValue)
-}
-
 function EmptyState({ title, description }) {
   return (
     <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center dark:border-slate-600 dark:bg-slate-900">
@@ -47,6 +38,7 @@ function EmptyState({ title, description }) {
 export default function Transactions() {
   const transactions = useStore((s) => s.transactions)
   const role = useStore((s) => s.role)
+  const currency = useStore((s) => s.currency)
   const addTransaction = useStore((s) => s.addTransaction)
 
   const [searchCategory, setSearchCategory] = useState('')
@@ -100,6 +92,8 @@ export default function Transactions() {
       category,
       type,
     })
+
+    toast.success(`Transaction added successfully: ${category}`)
 
     setFormCategory('')
     setFormAmount('0')
@@ -327,7 +321,7 @@ export default function Transactions() {
                         ].join(' ')}
                       >
                         {isIncome ? '+' : '−'}
-                        {formatMoney(t.amount)}
+                        {formatCurrency(t.amount, currency)}
                       </td>
                       <td className="px-4 py-3 text-slate-800 dark:text-slate-200">
                         {t.category}

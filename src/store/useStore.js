@@ -16,6 +16,7 @@ export const useStore = create(
       transactions: [...mockTransactions],
       role: 'viewer',
       theme: 'light',
+      currency: 'USD',
       isLoading: true,
 
       setRole: (role) => set({ role }),
@@ -26,6 +27,8 @@ export const useStore = create(
         set((state) => ({
           theme: state.theme === 'light' ? 'dark' : 'light',
         })),
+
+      setCurrency: (currency) => set({ currency }),
 
       addTransaction: (transaction) =>
         set((state) => {
@@ -62,6 +65,7 @@ export const useStore = create(
         transactions: state.transactions,
         role: state.role,
         theme: state.theme,
+        currency: state.currency,
       }),
     },
   ),

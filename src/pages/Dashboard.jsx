@@ -12,17 +12,7 @@ import {
   YAxis,
 } from 'recharts'
 import { useStore } from '../store/useStore'
-
-function formatMoney(value) {
-  const numberValue = Number(value)
-  if (!Number.isFinite(numberValue)) return '$0.00'
-
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format(numberValue)
-}
+import { formatCurrency } from '../utils/currency'
 
 function SkeletonBar({ className = '' }) {
   return (
@@ -35,7 +25,7 @@ function SkeletonBar({ className = '' }) {
 
 const MONTHLY_BUDGET = 3000
 
-function BudgetTracker({ totalExpenses }) {
+function BudgetTracker({ totalExpenses, currency }) {
   const pct =
     MONTHLY_BUDGET > 0 ? (totalExpenses / MONTHLY_BUDGET) * 100 : 0
   const fillWidth = Math.min(100, pct)
@@ -53,7 +43,7 @@ function BudgetTracker({ totalExpenses }) {
           Budget Tracker
         </p>
         <p className="text-xs font-medium tabular-nums text-slate-600 dark:text-slate-400">
-          {formatMoney(totalExpenses)} of {formatMoney(MONTHLY_BUDGET)}
+          {formatCurrency(totalExpenses, currency)} of {formatCurrency(MONTHLY_BUDGET, currency)}
         </p>
       </div>
       <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
@@ -99,7 +89,7 @@ function EmptyChart({ title, description }) {
   )
 }
 
-function BalanceChart({ trend, isDark }) {
+function BalanceChart({ trend, isDark, currency }) {
   const grid = isDark ? '#334155' : '#e2e8f0'
   const tick = isDark ? '#94a3b8' : '#64748b'
   const axis = isDark ? '#475569' : '#cbd5e1'
@@ -145,10 +135,10 @@ function BalanceChart({ trend, isDark }) {
                 stroke={axis}
                 tick={{ fontSize: 12, fill: tick }}
                 tickLine={{ stroke: axis }}
-                tickFormatter={(v) => formatMoney(v)}
+                tickFormatter={(v) => formatCurrency(v, currency)}
               />
               <Tooltip
-                formatter={(value) => formatMoney(value)}
+                formatter={(value) => formatCurrency(value, currency)}
                 labelFormatter={(label) => `Date: ${label}`}
                 contentStyle={tooltipStyle}
                 labelStyle={{ color: labelColor }}
@@ -169,7 +159,7 @@ function BalanceChart({ trend, isDark }) {
   )
 }
 
-function ExpensePieChart({ data, isDark }) {
+function ExpensePieChart({ data, isDark, currency }) {
   const hasData = data.length > 0
 
   const colors = [
@@ -189,85 +179,82 @@ function ExpensePieChart({ data, isDark }) {
     border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
     borderRadius: 8,
   }
-  const labelFill = isDark ? '#cbd5e1' : '#475569'
-
-  const pieLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    name,
-    percent,
-  }) => {
-    const RADIAN = Math.PI / 180
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5
-    const x = cx + radius * Math.cos(-midAngle * RADIAN)
-    const y = cy + radius * Math.sin(-midAngle * RADIAN)
-    return (
-      <text
-        x={x}
-        y={y}
-        fill={labelFill}
-        textAnchor={x > cx ? 'start' : 'end'}
-        dominantBaseline="central"
-        fontSize={11}
-      >
-        {`${name} ${(percent * 100).toFixed(0)}%`}
-      </text>
-    )
-  }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-      <div className="mb-3 flex items-center justify-between gap-3">
+    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div className="mb-6 flex items-center justify-between gap-3">
         <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
           Expense breakdown
         </p>
-        <span className="text-xs text-slate-600 dark:text-slate-400">
-          Pie chart
-        </span>
       </div>
 
-      <div className="h-[280px] w-full">
-        {!hasData ? (
-          <EmptyChart
-            title="No expenses to show"
-            description="Add expenses to see category distribution."
-          />
-        ) : (
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Tooltip
-                formatter={(value, name) => [
-                  formatMoney(value),
-                  String(name),
-                ]}
-                contentStyle={tooltipStyle}
-                labelStyle={{ color: isDark ? '#e2e8f0' : '#334155' }}
-                itemStyle={{ color: isDark ? '#e2e8f0' : '#334155' }}
-              />
-              <Pie
-                data={data}
-                dataKey="value"
-                nameKey="name"
-                outerRadius="75%"
-                innerRadius="45%"
-                label={pieLabel}
-                labelLine={{ stroke: isDark ? '#64748b' : '#94a3b8' }}
-              >
-                {data.map((entry, idx) => (
-                  <Cell
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={`${entry.name}-${idx}`}
-                    fill={colors[idx % colors.length]}
-                  />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        )}
-      </div>
+      {!hasData ? (
+        <EmptyChart
+          title="No expenses to show"
+          description="Add expenses to see category distribution."
+        />
+      ) : (
+        <div className="space-y-4">
+          <div className="h-[240px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Tooltip
+                  formatter={(value, name) => [
+                    formatCurrency(value, currency),
+                    String(name),
+                  ]}
+                  contentStyle={tooltipStyle}
+                  labelStyle={{ color: isDark ? '#e2e8f0' : '#334155' }}
+                  itemStyle={{ color: isDark ? '#e2e8f0' : '#334155' }}
+                  cursor={{ fill: 'rgba(0,0,0,0.1)' }}
+                />
+                <Pie
+                  data={data}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius="85%"
+                  innerRadius="50%"
+                  labelLine={false}
+                  label={false}
+                >
+                  {data.map((entry, idx) => (
+                    <Cell
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={`${entry.name}-${idx}`}
+                      fill={colors[idx % colors.length]}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="border-t border-slate-200 pt-4 dark:border-slate-700">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {data.map((entry, idx) => {
+                const totalValue = data.reduce((sum, item) => sum + item.value, 0)
+                const percentage = ((entry.value / totalValue) * 100).toFixed(1)
+                return (
+                  <div key={`legend-${entry.name}-${idx}`} className="flex items-center gap-2">
+                    <div
+                      className="h-3 w-3 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: colors[idx % colors.length] }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="truncate text-xs font-medium text-slate-700 dark:text-slate-300">
+                        {entry.name}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {percentage}%
+                      </p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -276,6 +263,7 @@ export default function Dashboard() {
   const transactions = useStore((s) => s.transactions)
   const role = useStore((s) => s.role)
   const theme = useStore((s) => s.theme)
+  const currency = useStore((s) => s.currency)
   const isLoading = useStore((s) => s.isLoading)
   const deleteTransaction = useStore((s) => s.deleteTransaction)
   const isDark = theme === 'dark'
@@ -471,7 +459,7 @@ export default function Dashboard() {
             Total balance
           </p>
           <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">
-            {formatMoney(balance)}
+            {formatCurrency(balance, currency)}
           </p>
         </div>
         <div className={summaryCardClass}>
@@ -479,7 +467,7 @@ export default function Dashboard() {
             Income
           </p>
           <p className="mt-2 text-2xl font-semibold text-emerald-700 dark:text-emerald-400">
-            {formatMoney(totalIncome)}
+            {formatCurrency(totalIncome, currency)}
           </p>
         </div>
         <div className={summaryCardClass}>
@@ -487,7 +475,7 @@ export default function Dashboard() {
             Expenses
           </p>
           <p className="mt-2 text-2xl font-semibold text-rose-700 dark:text-rose-400">
-            {formatMoney(totalExpenses)}
+            {formatCurrency(totalExpenses, currency)}
           </p>
         </div>
       </section>
@@ -496,7 +484,7 @@ export default function Dashboard() {
         <h3 className="text-xs font-semibold uppercase tracking-wide text-indigo-900/70 dark:text-indigo-300/90">
           Insights
         </h3>
-        <BudgetTracker totalExpenses={totalExpenses} />
+        <BudgetTracker totalExpenses={totalExpenses} currency={currency} />
         {highestSpendingThisMonth ? (
           <p className="mt-4 border-t border-indigo-100/90 pt-4 text-sm leading-relaxed text-slate-700 dark:border-indigo-800/50 dark:text-slate-300">
             Your highest spending category this month is{' '}
@@ -505,7 +493,7 @@ export default function Dashboard() {
             </span>{' '}
             at{' '}
             <span className="font-medium tabular-nums text-slate-900 dark:text-white">
-              {formatMoney(highestSpendingThisMonth.amount)}
+              {formatCurrency(highestSpendingThisMonth.amount, currency)}
             </span>
             .
           </p>
@@ -518,8 +506,8 @@ export default function Dashboard() {
       </section>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-2">
-        <BalanceChart trend={trend} isDark={isDark} />
-        <ExpensePieChart data={expenseByCategory} isDark={isDark} />
+        <BalanceChart trend={trend} isDark={isDark} currency={currency} />
+        <ExpensePieChart data={expenseByCategory} isDark={isDark} currency={currency} />
       </section>
 
       <section className="mt-10">
@@ -582,7 +570,7 @@ export default function Dashboard() {
                     }`}
                   >
                     {t.type === 'expense' ? '−' : '+'}
-                    {formatMoney(t.amount)}
+                    {formatCurrency(t.amount, currency)}
                   </td>
                   {canEdit && (
                     <td className="px-4 py-3 text-right">
